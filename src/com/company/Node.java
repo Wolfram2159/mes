@@ -19,6 +19,9 @@ public class Node {
     public String toString() {
         return "Node{" +
                 "id=" + id +
+                ", x=" + x +
+                ", y=" + y +
+                ", t=" + t +
                 ", B=" + B +
                 '}';
     }

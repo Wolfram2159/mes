@@ -1,5 +1,6 @@
 package com.company;
 
+import com.company.matrixes.Matrix;
 import com.company.matrixes.MatrixForEDifferential;
 import com.company.matrixes.MatrixForFormFunctionsValue;
 import com.company.matrixes.MatrixForNDifferential;
@@ -10,13 +11,13 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Universal {
-    private MatrixForEDifferential eDifferentials;
-    private MatrixForNDifferential nDifferentials;
-    private MatrixForFormFunctionsValue functionsValues;
+    private Matrix eDifferentials;
+    private Matrix nDifferentials;
+    private Matrix functionsValues;
 
     private List<MesPoint> pointsList;
 
-    public Universal(MesPoint... points){
+    public Universal(MesPoint... points) {
         pointsList = new ArrayList<>();
         pointsList.addAll(Arrays.asList(points));
         eDifferentials = new MatrixForEDifferential();
@@ -24,7 +25,8 @@ public class Universal {
         functionsValues = new MatrixForFormFunctionsValue();
         calculateMatrixes();
     }
-    private void calculateMatrixes(){
+
+    private void calculateMatrixes() {
         for (MesPoint mesPoint : pointsList) {
             eDifferentials.addPointAndCalculateDifferentials(mesPoint);
             nDifferentials.addPointAndCalculateDifferentials(mesPoint);
@@ -32,13 +34,15 @@ public class Universal {
         }
     }
 
-    public void printNMatrix(){
+    public void printNMatrix() {
         nDifferentials.printMatrix();
     }
-    public void printEMatrix(){
+
+    public void printEMatrix() {
         eDifferentials.printMatrix();
     }
-    public void printValuesMatrix(){
+
+    public void printValuesMatrix() {
         functionsValues.printMatrix();
     }
 }

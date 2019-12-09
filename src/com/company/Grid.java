@@ -1,8 +1,5 @@
 package com.company;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Grid {
     private Node[] nodeList;
     private Element[] elementList;
@@ -41,7 +38,7 @@ public class Grid {
         int id = 0;
         for (int i = 0; i < globalDate.getnW() - 1; i++) {
             for (int j = 0; j < globalDate.getnH() - 1; j++) {
-                Element element = new Element(id, i, j, determineNodesForElement(i, j));
+                Element element = new Element(id, determineNodesForElement(i, j));
                 elementList[id] = element;
                 id++;
             }
@@ -64,6 +61,10 @@ public class Grid {
 
     public Element getElement(int x, int y) {
         int id = (globalDate.getnH() - 1) * x + y;
+        return elementList[id];
+    }
+
+    public Element getElementById(int id){
         return elementList[id];
     }
 }

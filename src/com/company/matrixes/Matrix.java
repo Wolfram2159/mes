@@ -10,7 +10,7 @@ public abstract class Matrix {
         matrix = new ArrayList<>();
     }
 
-    // TODO: 2019-11-03 maybe hashmap instaed of List
+    //TODO: 2019-11-03 maybe hashmap instaed of List
     public void addPointAndCalculateDifferentials(MesPoint point){
         List<Double> valuesList = new ArrayList<>();
         valuesList.add(firstFunction(point));
@@ -24,7 +24,7 @@ public abstract class Matrix {
         System.out.println("Values for " + getClass().getSimpleName());
         for (List<Double> doubleList : matrix) {
             for (Double value : doubleList) {
-                System.out.print(value + "\t");
+                System.out.format("%.3f \t", value);
             }
             System.out.println();
         }

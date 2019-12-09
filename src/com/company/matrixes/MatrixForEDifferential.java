@@ -1,7 +1,5 @@
 package com.company.matrixes;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class MatrixForEDifferential extends Matrix {
 
