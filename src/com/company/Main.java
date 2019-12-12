@@ -26,17 +26,22 @@ public class Main {
         universal.printNMatrix();
         universal.printValuesMatrix();
 
-        SimpleMatrix a = new SimpleMatrix(2,2);
-        SimpleMatrix b = new SimpleMatrix(2,1);
-        a.addValueAt(0,0,1);
-        a.addValueAt(0,1,2);
-        a.addValueAt(1,0,3);
-        a.addValueAt(1,1,4);
-        b.addValueAt(0,0,4);
-        b.addValueAt(1,0,5);
+        SimpleMatrix a = new SimpleMatrix(2, 2);
+        SimpleMatrix b = new SimpleMatrix(2, 1);
+        a.addValueAt(0, 0, 1);
+        a.addValueAt(0, 1, 1);
+        a.addValueAt(1, 0, 1);
+        a.addValueAt(1, 1, 2);
+        //b.addValueAt(0, 0, 2);
+        //b.addValueAt(1, 0, 5);
         try {
-            SimpleMatrix multiplicate = SimpleMatrix.multiplicate(a, b);
-            multiplicate.printMatrix();
+            a.addMatrixAtIndex(0, 1, b);
+            //a.printMatrix();
+            SimpleMatrix x = new SimpleMatrix(a);
+            a.transponateMatrix();
+            //a.printMatrix();
+            SimpleMatrix simpleMatrix = SimpleMatrix.multiplyMatrixes(a, x);
+            simpleMatrix.printMatrix();
         } catch (Exception ex) {
             ex.printStackTrace();
         }

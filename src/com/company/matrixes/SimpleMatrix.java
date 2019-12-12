@@ -1,7 +1,5 @@
 package com.company.matrixes;
 
-import com.sun.xml.internal.ws.api.message.ExceptionHasMessage;
-
 public class SimpleMatrix {
     //HxW
     private int n;
@@ -12,9 +10,15 @@ public class SimpleMatrix {
         this.n = n;
         this.m = m;
         matrix = new double[n][m];
+    }
+
+    public SimpleMatrix(SimpleMatrix a) {
+        this.n = a.getN();
+        this.m = a.getM();
+        matrix = new double[n][m];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
-                matrix[i][j] = 0;
+                matrix[i][j] = a.matrix[i][j];
             }
         }
     }
@@ -35,7 +39,7 @@ public class SimpleMatrix {
         return matrix[i];
     }
 
-    public static SimpleMatrix multiplicate(SimpleMatrix a, SimpleMatrix b) throws Exception {
+    public static SimpleMatrix multiplyMatrixes(SimpleMatrix a, SimpleMatrix b) throws Exception {
         if (a.getM() != b.getN()) {
             throw new Exception("cannot multiply matrixes");
         }
@@ -54,7 +58,42 @@ public class SimpleMatrix {
         return product;
     }
 
-    public void printMatrix(){
+    public void addMatrixAtIndex(int i, int j, SimpleMatrix matrix) throws Exception {
+        int rangeX = matrix.getM() + j;
+        int rangeY = matrix.getN() + i;
+        if (rangeX > this.m) {
+            throw new Exception("going out of X bound");
+        } else if (rangeY > this.n) {
+            throw new Exception("going out of Y bound");
+        }
+        double[][] matrixToAdd = matrix.getMatrix();
+        for (int k = 0; k < matrix.getN(); k++) {
+            for (int l = 0; l < matrix.getM(); l++) {
+                this.matrix[i + k][j + l] += matrixToAdd[k][l];
+            }
+        }
+    }
+
+    public void transponateMatrix() {
+        double det = matrix[0][0] * matrix[1][1] - matrix[1][0] * matrix[0][1];
+        det = 1 / det;
+        double a = matrix[0][0];
+        matrix[0][0] = matrix[1][1];
+        matrix[1][1] = a;
+        matrix[1][0] *= -1;
+        matrix[0][1] *= -1;
+        multiplyByScalar(det);
+    }
+
+    public void multiplyByScalar(double scalar) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                matrix[i][j] *= scalar;
+            }
+        }
+    }
+
+    public void printMatrix() {
         for (int i = 0; i < getN(); i++) {
             for (int j = 0; j < getM(); j++) {
                 System.out.print(matrix[i][j] + "\t");
