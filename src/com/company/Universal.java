@@ -4,7 +4,7 @@ import com.company.matrixes.Matrix;
 import com.company.matrixes.MatrixForEDifferential;
 import com.company.matrixes.MatrixForFormFunctionsValue;
 import com.company.matrixes.MatrixForNDifferential;
-import com.company.matrixes.MesPoint;
+import com.company.matrixes.IntegralPoint;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,9 +15,9 @@ public class Universal {
     private Matrix nDifferentials;
     private Matrix functionsValues;
 
-    private List<MesPoint> pointsList;
+    private List<IntegralPoint> pointsList;
 
-    public Universal(MesPoint... points) {
+    public Universal(IntegralPoint... points) {
         pointsList = new ArrayList<>();
         pointsList.addAll(Arrays.asList(points));
         eDifferentials = new MatrixForEDifferential();
@@ -27,11 +27,23 @@ public class Universal {
     }
 
     private void calculateMatrixes() {
-        for (MesPoint mesPoint : pointsList) {
-            eDifferentials.addPointAndCalculateDifferentials(mesPoint);
-            nDifferentials.addPointAndCalculateDifferentials(mesPoint);
-            functionsValues.addPointAndCalculateDifferentials(mesPoint);
+        for (IntegralPoint integralPoint : pointsList) {
+            eDifferentials.addPointAndCalculateDifferentials(integralPoint);
+            nDifferentials.addPointAndCalculateDifferentials(integralPoint);
+            functionsValues.addPointAndCalculateDifferentials(integralPoint);
         }
+    }
+
+    public Matrix geteDifferentials() {
+        return eDifferentials;
+    }
+
+    public Matrix getnDifferentials() {
+        return nDifferentials;
+    }
+
+    public Matrix getFunctionsValues() {
+        return functionsValues;
     }
 
     public void printNMatrix() {

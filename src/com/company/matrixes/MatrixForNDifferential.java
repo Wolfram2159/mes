@@ -7,22 +7,22 @@ public class MatrixForNDifferential extends Matrix {
     }
 
     @Override
-    protected double firstFunction(MesPoint point) {
+    protected double firstFunction(IntegralPoint point) {
         return -0.25 * (1 - point.e);
     }
 
     @Override
-    protected double secondFunction(MesPoint point) {
+    protected double secondFunction(IntegralPoint point) {
         return -0.25 * (1 + point.e);
     }
 
     @Override
-    protected double thirdFunction(MesPoint point) {
+    protected double thirdFunction(IntegralPoint point) {
         return 0.25 * (1 + point.e);
     }
 
     @Override
-    protected double fourthFunction(MesPoint point) {
+    protected double fourthFunction(IntegralPoint point) {
         return 0.25 * (1 - point.e);
     }
 }

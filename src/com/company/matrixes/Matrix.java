@@ -10,8 +10,7 @@ public abstract class Matrix {
         matrix = new ArrayList<>();
     }
 
-    //TODO: 2019-11-03 maybe hashmap instaed of List
-    public void addPointAndCalculateDifferentials(MesPoint point){
+    public void addPointAndCalculateDifferentials(IntegralPoint point){
         List<Double> valuesList = new ArrayList<>();
         valuesList.add(firstFunction(point));
         valuesList.add(secondFunction(point));
@@ -31,8 +30,12 @@ public abstract class Matrix {
         System.out.println();
     }
 
-    protected abstract double firstFunction(MesPoint point);
-    protected abstract double secondFunction(MesPoint point);
-    protected abstract double thirdFunction(MesPoint point);
-    protected abstract double fourthFunction(MesPoint point);
+    protected abstract double firstFunction(IntegralPoint point);
+    protected abstract double secondFunction(IntegralPoint point);
+    protected abstract double thirdFunction(IntegralPoint point);
+    protected abstract double fourthFunction(IntegralPoint point);
+
+    public List<Double> getMatrixForPoint(int index) {
+        return matrix.get(index);
+    }
 }

@@ -6,6 +6,10 @@ public class SimpleMatrix {
     private int m;
     private double[][] matrix;
 
+    public SimpleMatrix(){
+
+    }
+
     public SimpleMatrix(int n, int m) {
         this.n = n;
         this.m = m;
@@ -23,6 +27,10 @@ public class SimpleMatrix {
         }
     }
 
+    public double getValueAt(int i, int j){
+        return matrix[i][j];
+    }
+
     public void addValueAt(int i, int j, double value) {
         matrix[i][j] += value;
     }
@@ -37,6 +45,22 @@ public class SimpleMatrix {
 
     public double[] getRowAt(int i) {
         return matrix[i];
+    }
+
+    public SimpleMatrix getRowAsMatrix(int i) {
+        SimpleMatrix row = new SimpleMatrix(1, m);
+        for (int k = 0; k < m; k++) {
+            row.addValueAt(0, k, matrix[i][k]);
+        }
+        return row;
+    }
+
+    public SimpleMatrix getColumnAsMatrix(int i) {
+        SimpleMatrix column = new SimpleMatrix(this.n, 1);
+        for (int k = 0; k < n; k++) {
+            column.addValueAt(k, 0, matrix[k][i]);
+        }
+        return column;
     }
 
     public static SimpleMatrix multiplyMatrixes(SimpleMatrix a, SimpleMatrix b) throws Exception {
@@ -74,7 +98,7 @@ public class SimpleMatrix {
         }
     }
 
-    public void transponateMatrix() {
+    public void inverseMatrix() {
         double det = matrix[0][0] * matrix[1][1] - matrix[1][0] * matrix[0][1];
         det = 1 / det;
         double a = matrix[0][0];
@@ -85,12 +109,28 @@ public class SimpleMatrix {
         multiplyByScalar(det);
     }
 
+    public SimpleMatrix transponateMatrix() {
+        SimpleMatrix transponated = new SimpleMatrix(this.m, this.n);
+        for (int i = 0; i < this.m; i++) {
+            double[] column = getColumnAt(i);
+            for (int j = 0; j < column.length; j++) {
+                transponated.addValueAt(i, j, column[j]);
+            }
+        }
+        return transponated;
+    }
+
     public void multiplyByScalar(double scalar) {
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
                 matrix[i][j] *= scalar;
             }
         }
+    }
+
+    public double calculateDeteminate(){
+        double det = matrix[0][0] * matrix[1][1] - matrix[1][0] * matrix[0][1];
+        return det;
     }
 
     public void printMatrix() {
@@ -100,6 +140,7 @@ public class SimpleMatrix {
             }
             System.out.println();
         }
+        System.out.println();
     }
 
     public int getN() {
