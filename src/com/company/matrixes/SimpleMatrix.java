@@ -6,7 +6,7 @@ public class SimpleMatrix {
     private int m;
     private double[][] matrix;
 
-    public SimpleMatrix(){
+    public SimpleMatrix() {
 
     }
 
@@ -27,7 +27,7 @@ public class SimpleMatrix {
         }
     }
 
-    public double getValueAt(int i, int j){
+    public double getValueAt(int i, int j) {
         return matrix[i][j];
     }
 
@@ -98,6 +98,19 @@ public class SimpleMatrix {
         }
     }
 
+    public static SimpleMatrix addMatrixes(SimpleMatrix a, SimpleMatrix b) throws Exception {
+        if (a.m != b.m || a.n != b.n) {
+            throw new Exception("cannot add matrixes");
+        }
+        SimpleMatrix result = new SimpleMatrix(a.n, a.m);
+        for (int n = 0; n < a.n; n++) {
+            for (int m = 0; m < a.m; m++) {
+                result.matrix[n][m] = a.getValueAt(n, m) + b.getValueAt(n, m);
+            }
+        }
+        return result;
+    }
+
     public void inverseMatrix() {
         double det = matrix[0][0] * matrix[1][1] - matrix[1][0] * matrix[0][1];
         det = 1 / det;
@@ -128,9 +141,8 @@ public class SimpleMatrix {
         }
     }
 
-    public double calculateDeteminate(){
-        double det = matrix[0][0] * matrix[1][1] - matrix[1][0] * matrix[0][1];
-        return det;
+    public double calculateDeterminate() {
+        return matrix[0][0] * matrix[1][1] - matrix[1][0] * matrix[0][1];
     }
 
     public void printMatrix() {

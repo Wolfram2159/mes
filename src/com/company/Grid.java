@@ -1,12 +1,13 @@
 package com.company;
 
+import com.company.matrixes.MatrixMapper;
 import com.company.matrixes.SimpleMatrix;
 
 import java.util.List;
 
 public class Grid {
     private Node[] nodeList;
-    private Element[] elementList;
+    private Element[] grid;
     private static final int ELEMENT_NODES_COUNT = 4;
 
     private GlobalDate globalDate;
@@ -15,7 +16,7 @@ public class Grid {
     public Grid(GlobalDate globalDate) {
         this.globalDate = globalDate;
         nodeList = new Node[globalDate.getnN()];
-        elementList = new Element[globalDate.getnE()];
+        grid = new Element[globalDate.getnE()];
         buildGrid();
     }
 
@@ -44,7 +45,7 @@ public class Grid {
         for (int i = 0; i < globalDate.getnW() - 1; i++) {
             for (int j = 0; j < globalDate.getnH() - 1; j++) {
                 Element element = new Element(id, determineNodesForElement(i, j));
-                elementList[id] = element;
+                grid[id] = element;
                 id++;
             }
         }
@@ -66,85 +67,116 @@ public class Grid {
 
     public Element getElement(int x, int y) {
         int id = (globalDate.getnH() - 1) * x + y;
-        return elementList[id];
+        return grid[id];
     }
 
     public Element getElementById(int id) {
-        return elementList[id];
+        return grid[id];
     }
 
-    public void calculateMatrixForAllElements(double K) {
-        for (Element element : elementList) {
-            SimpleMatrix matrixdndx = new SimpleMatrix(4, 4);
-            SimpleMatrix matrixdndy = new SimpleMatrix(4, 4);
-            System.out.println("Printing for el " + element.getId());
-            for (int i = 0; i < 4; i++) {
-                List<Double> EDiff = universal.geteDifferentials().getMatrixForPoint(i);
-                List<Double> NDiff = universal.getnDifferentials().getMatrixForPoint(i);
-                SimpleMatrix matrixA = calculateJacobianMatrix(element, EDiff, NDiff);
-                element.setJacobians(i, matrixA);
+    private final static int FORM_FUNCTION_COUNT = 4;
+    private final static int INTEGRAL_POINTS_COUNT = 4;
+
+    public void calculateMatrixesForAllElements(double K, double c, double ro, double alfa) throws Exception {
+        calculateDifferentials();
+        calculateHMatrixes(K);
+        calculateBoundaryConditions(alfa);
+        calculateCMatrixes(c, ro);
+        calculatePVectors(alfa);
+    }
+
+    private void calculateDifferentials() throws Exception {
+        for (Element element : grid) {
+            SimpleMatrix xDifferentialMatrix = new SimpleMatrix(4, 4);
+            SimpleMatrix yDifferentialMatrix = new SimpleMatrix(4, 4);
+            for (int integralPoint = 0; integralPoint < INTEGRAL_POINTS_COUNT; integralPoint++) {
+                List<Double> eDifferentialMatrix = universal.geteDifferentials().getMatrixForPoint(integralPoint);
+                List<Double> nDifferentialMatrix = universal.getnDifferentials().getMatrixForPoint(integralPoint);
+                //[A] * {b} = {c} <=> {b} = [A]-1 * {c}
+                SimpleMatrix matrixA = calculateJacobianMatrixForElement(element, eDifferentialMatrix, nDifferentialMatrix);
+                element.setJacobians(integralPoint, matrixA);
                 matrixA.inverseMatrix();
-                for (int j = 0; j < 4; j++) {
+                for (int formFunction = 0; formFunction < FORM_FUNCTION_COUNT; formFunction++) {
                     SimpleMatrix matrixC = new SimpleMatrix(2, 1);
-                    matrixC.addValueAt(0, 0, EDiff.get(j));
-                    matrixC.addValueAt(1, 0, NDiff.get(j));
-                    try {
-                        SimpleMatrix matrixB = SimpleMatrix.multiplyMatrixes(matrixA, matrixC);
-                        matrixdndx.addValueAt(i, j, matrixB.getValueAt(0, 0));
-                        matrixdndy.addValueAt(i, j, matrixB.getValueAt(1, 0));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    matrixC.addValueAt(0, 0, eDifferentialMatrix.get(formFunction));
+                    matrixC.addValueAt(1, 0, nDifferentialMatrix.get(formFunction));
+
+                    SimpleMatrix matrixB = SimpleMatrix.multiplyMatrixes(matrixA, matrixC);
+                    xDifferentialMatrix.addValueAt(integralPoint, formFunction, matrixB.getValueAt(0, 0));
+                    yDifferentialMatrix.addValueAt(integralPoint, formFunction, matrixB.getValueAt(1, 0));
                 }
             }
-            matrixdndy.printMatrix();
-            element.setdNdxDiff(matrixdndx);
-            element.setdNdyDiff(matrixdndy);
+            element.setdNdxDiff(xDifferentialMatrix);
+            element.setdNdyDiff(yDifferentialMatrix);
+            SimpleMatrix formFunctionValues = MatrixMapper.convertMatrix(universal.getFunctionsValues());
+            element.setFormFunctionValues(formFunctionValues);
         }
-        calculateHMatrix(K);
     }
 
-    public void calculateHMatrix(double K) {
-        for (Element element : elementList) {
-            System.out.println("ELEMENTOS");
-            SimpleMatrix dx = element.getdNdxDiff();
-            SimpleMatrix dy = element.getdNdyDiff();
-            for (int i = 0; i < 4; i++) {
+    private void calculateHMatrixes(double K) throws Exception {
+        for (Element element : grid) {
+            SimpleMatrix xDifferential = element.getdNdxDiff();
+            SimpleMatrix yDifferential = element.getdNdyDiff();
+            for (int integralPoint = 0; integralPoint < INTEGRAL_POINTS_COUNT; integralPoint++) {
+                SimpleMatrix jacobian = element.getJacobians(integralPoint);
+                double detJ = jacobian.calculateDeterminate();
                 //DN/DX
-                SimpleMatrix jacobian = element.getJacobians(i);
-                double detJ = jacobian.calculateDeteminate();
-                SimpleMatrix rowdx = dx.getRowAsMatrix(i);
-                SimpleMatrix rowdxT = rowdx.transponateMatrix();
-                SimpleMatrix rowRowTdx = new SimpleMatrix();
-                SimpleMatrix rowRowTdy = new SimpleMatrix();
-                try {
-                    rowRowTdx = SimpleMatrix.multiplyMatrixes(rowdxT, rowdx);
-                    rowRowTdx.multiplyByScalar(detJ);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                SimpleMatrix xRowDiff = xDifferential.getRowAsMatrix(integralPoint);
+                SimpleMatrix xDifferentialIntegral = multiplyRowByColumn(xRowDiff);
                 //DN/DY
-                SimpleMatrix rowdy = dy.getRowAsMatrix(i);
-                SimpleMatrix rowdyT = rowdy.transponateMatrix();
-                try {
-                    rowRowTdy = SimpleMatrix.multiplyMatrixes(rowdyT, rowdy);
-                    rowRowTdy.multiplyByScalar(detJ);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                try {
-                    rowRowTdx.addMatrixAtIndex(0,0, rowRowTdy);
-                    rowRowTdx.multiplyByScalar(K);
-                    element.setSmallHMatrixes(i, rowRowTdx);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                SimpleMatrix yRowDiff = yDifferential.getRowAsMatrix(integralPoint);
+                SimpleMatrix yDifferentialIntegral = multiplyRowByColumn(yRowDiff);
+                //Local H
+                SimpleMatrix hLocalMatrix = SimpleMatrix.addMatrixes(xDifferentialIntegral, yDifferentialIntegral);
+                hLocalMatrix.multiplyByScalar(K * detJ);
+                element.addSubMatrixToH(hLocalMatrix);
             }
-            element.calculateH();
+            element.getLocalMatrixH().printMatrix();
         }
     }
 
-    private SimpleMatrix calculateJacobianMatrix(Element element, List<Double> EDiff, List<Double> NDiff) {
+    private void calculateBoundaryConditions(double alfa) {
+        for (Element element : grid) {
+            // TODO: 2019-12-26 BC
+        }
+    }
+
+    private SimpleMatrix multiplyRowByColumn(SimpleMatrix rowForIntegralPoint) throws Exception {
+        SimpleMatrix columnForIntegralPoint = rowForIntegralPoint.transponateMatrix();
+        return SimpleMatrix.multiplyMatrixes(columnForIntegralPoint, rowForIntegralPoint);
+    }
+
+    private void calculateCMatrixes(double c, double ro) throws Exception {
+        for (Element element : grid) {
+            SimpleMatrix formFunctionValues = element.getFormFunctionValues();
+            for (int integralPoint = 0; integralPoint < INTEGRAL_POINTS_COUNT; integralPoint++) {
+                SimpleMatrix jacobian = element.getJacobians(integralPoint);
+                double detJ = jacobian.calculateDeterminate();
+                SimpleMatrix formFunctionsRow = formFunctionValues.getRowAsMatrix(integralPoint);
+                SimpleMatrix subMatrixC = multiplyRowByColumn(formFunctionsRow);
+                subMatrixC.multiplyByScalar(c * ro * detJ);
+                element.addSubMatrixToC(subMatrixC);
+            }
+            element.getLocalMatrixC().printMatrix();
+        }
+    }
+
+    private void calculatePVectors(double alfa) {
+        for (Element element : grid) {
+            SimpleMatrix formFunctionValues = element.getFormFunctionValues();
+            for (int integralPoint = 0; integralPoint < INTEGRAL_POINTS_COUNT; integralPoint++) {
+                SimpleMatrix jacobian = element.getJacobians(integralPoint);
+                double detJ = jacobian.calculateDeterminate();
+                SimpleMatrix formFunctionsRow = formFunctionValues.getRowAsMatrix(integralPoint);
+                SimpleMatrix subVectorP = formFunctionsRow.transponateMatrix();
+                subVectorP.multiplyByScalar(alfa * detJ);
+                element.addSubVectorToP(subVectorP);
+            }
+            element.getLocalVectorP().printMatrix();
+        }
+    }
+
+    private SimpleMatrix calculateJacobianMatrixForElement(Element element, List<Double> EDiff, List<Double> NDiff) {
         SimpleMatrix jacobian = new SimpleMatrix(2, 2);
         double dxdE = 0;
         double dydE = 0;

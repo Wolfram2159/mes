@@ -5,14 +5,14 @@ public class Node {
     private int x;
     private int y;
     private float t;
-    private boolean B;
+    private boolean BC;
 
-    public Node(int id, int x, int y, float t, boolean b) {
+    public Node(int id, int x, int y, float t, boolean BC) {
         this.id = id;
         this.x = x;
         this.y = y;
         this.t = t;
-        B = b;
+        this.BC = BC;
     }
 
     @Override
@@ -22,7 +22,7 @@ public class Node {
                 ", x=" + x +
                 ", y=" + y +
                 ", t=" + t +
-                ", B=" + B +
+                ", B=" + BC +
                 '}';
     }
 
@@ -50,11 +50,11 @@ public class Node {
         this.t = t;
     }
 
-    public boolean isB() {
-        return B;
+    public boolean isBC() {
+        return BC;
     }
 
-    public void setB(boolean b) {
-        B = b;
+    public void setBC(boolean BC) {
+        this.BC = BC;
     }
 }

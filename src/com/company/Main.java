@@ -4,6 +4,11 @@ import com.company.matrixes.IntegralPoint;
 
 public class Main {
 
+    private final static int K = 30;
+    private final static int c = 700;
+    private final static int ro = 7800;
+    private final static int alfa = 25;
+
     public static void main(String[] args) {
         double e = Math.sqrt((double) 1 / 3);
         double n = Math.sqrt((double) 1 / 3);
@@ -17,6 +22,10 @@ public class Main {
         GlobalDate globalDate = new GlobalDate(1, 1, 2, 3);
         Grid grid = new Grid(globalDate);
         grid.setUniversal(universal);
-        grid.calculateMatrixForAllElements(30);
+        try {
+            grid.calculateMatrixesForAllElements(K, c, ro, alfa);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }

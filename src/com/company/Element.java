@@ -3,43 +3,70 @@ package com.company;
 import com.company.matrixes.SimpleMatrix;
 
 import java.util.Arrays;
-import java.util.List;
 
 public class Element {
-    private final static int ELEMENT_NODES = 4;
 
     private int id;
 
     private Node[] nodes;
     private SimpleMatrix dNdyDiff = new SimpleMatrix(4, 4);
     private SimpleMatrix dNdxDiff = new SimpleMatrix(4, 4);
+    private SimpleMatrix formFunctionValues = new SimpleMatrix(4, 4);
     private SimpleMatrix[] jacobians = new SimpleMatrix[4];
-    private SimpleMatrix[] smallHMatrixes = new SimpleMatrix[4];
-    private SimpleMatrix H;
+    private SimpleMatrix localMatrixH;
+    private SimpleMatrix localMatrixC;
+    private SimpleMatrix localVectorP;
 
     public Element(int id, Node[] nodes) {
         this.id = id;
         this.nodes = nodes;
+        this.localMatrixH = new SimpleMatrix(4, 4);
+        this.localMatrixC = new SimpleMatrix(4, 4);
+        this.localVectorP = new SimpleMatrix(4, 1);
     }
 
-    public void calculateH() {
-        SimpleMatrix H = new SimpleMatrix(4, 4);
-        for (int i = 0; i < 4; i++) {
-            try {
-                H.addMatrixAtIndex(0,0, smallHMatrixes[i]);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+    public void addSubMatrixToH(SimpleMatrix localSubMatrix) {
+        try {
+            localMatrixH.addMatrixAtIndex(0, 0, localSubMatrix);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        this.H = H;
     }
 
-    public SimpleMatrix getSmallHMatrixes(int index) {
-        return smallHMatrixes[index];
+    public void addSubMatrixToC(SimpleMatrix localSubMatrix){
+        try {
+            localMatrixC.addMatrixAtIndex(0, 0, localSubMatrix);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    public void setSmallHMatrixes(int index, SimpleMatrix smallHMatrixes) {
-        this.smallHMatrixes[index] = smallHMatrixes;
+    public void addSubVectorToP(SimpleMatrix localSubMatrix){
+        try {
+            localVectorP.addMatrixAtIndex(0, 0, localSubMatrix);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public SimpleMatrix getLocalMatrixH() {
+        return localMatrixH;
+    }
+
+    public SimpleMatrix getLocalMatrixC() {
+        return localMatrixC;
+    }
+
+    public SimpleMatrix getLocalVectorP() {
+        return localVectorP;
+    }
+
+    public SimpleMatrix getFormFunctionValues() {
+        return formFunctionValues;
+    }
+
+    public void setFormFunctionValues(SimpleMatrix formFunctionValues) {
+        this.formFunctionValues = formFunctionValues;
     }
 
     public void setdNdyDiff(SimpleMatrix dNdyDiff) {
