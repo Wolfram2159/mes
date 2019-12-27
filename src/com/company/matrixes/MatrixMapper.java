@@ -3,11 +3,10 @@ package com.company.matrixes;
 import java.util.List;
 
 public class MatrixMapper {
-    private final static int INTEGRAL_POINTS_COUNT = 4;
-
     public static SimpleMatrix convertMatrix(Matrix sourceMatrix) {
-        SimpleMatrix result = new SimpleMatrix(4, 4);
-        for (int integralPoint = 0; integralPoint < INTEGRAL_POINTS_COUNT; integralPoint++) {
+        int size = sourceMatrix.getSizeOfMatrix();
+        SimpleMatrix result = new SimpleMatrix(size, 4);
+        for (int integralPoint = 0; integralPoint < size; integralPoint++) {
             List<Double> valuesForPoint = sourceMatrix.getMatrixForPoint(integralPoint);
             result.addValueAt(integralPoint, 0, valuesForPoint.get(0));
             result.addValueAt(integralPoint, 1, valuesForPoint.get(1));

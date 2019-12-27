@@ -1,5 +1,6 @@
 package com.company;
 
+import com.company.matrixes.Matrix;
 import com.company.matrixes.MatrixMapper;
 import com.company.matrixes.SimpleMatrix;
 
@@ -135,10 +136,42 @@ public class Grid {
         }
     }
 
-    private void calculateBoundaryConditions(double alfa) {
+    private void calculateBoundaryConditions(double alfa) throws Exception {
+        final int[][] indexes = {
+                {0, 1},
+                {1, 2},
+                {2, 3},
+                {3, 0}
+        };
+
+        List<Matrix> functionsValuesForBoundaryConditions = universal.getFunctionsValuesForBoundaryConditions();
+
         for (Element element : grid) {
-            // TODO: 2019-12-26 BC
+            for (int side = 0; side < 4; side++) {
+                Node firstNode = element.getNodes()[indexes[side][0]];
+                Node secondNode = element.getNodes()[indexes[side][1]];
+                SimpleMatrix jacobians = element.getJacobians(side);
+                double detJ = jacobians.calculateDeterminate();
+                if (checkIfNodesFromBound(firstNode, secondNode)){
+                    Matrix boundaryCondForSide = functionsValuesForBoundaryConditions.get(side);
+                    SimpleMatrix matrix = MatrixMapper.convertMatrix(boundaryCondForSide);
+                    for (int integralPoint = 0; integralPoint < boundaryCondForSide.getSizeOfMatrix(); integralPoint++) {
+                        SimpleMatrix rowForIntegralPoint = matrix.getRowAsMatrix(integralPoint);
+                        SimpleMatrix subMatrixForBoundaryCond = multiplyRowByColumn(rowForIntegralPoint);
+                        subMatrixForBoundaryCond.multiplyByScalar(alfa * detJ);
+                        element.addSubMatrixToH(subMatrixForBoundaryCond);
+                    }
+                }
+            }
         }
+    }
+
+
+    private boolean checkIfNodesFromBound(Node first, Node second){
+        return  ((first.getX() == 0 && second.getX() == 0) ||
+                (first.getY() == 0 && second.getY() == 0) ||
+                (first.getX() == globalDate.getnW() - 1 && second.getX() == globalDate.getnW() - 1) ||
+                (first.getY() == globalDate.getnH() - 1 && second.getY() == globalDate.getnH() - 1));
     }
 
     private SimpleMatrix multiplyRowByColumn(SimpleMatrix rowForIntegralPoint) throws Exception {

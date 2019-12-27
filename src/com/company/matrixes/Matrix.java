@@ -11,12 +11,22 @@ public abstract class Matrix {
     }
 
     public void addPointAndCalculateDifferentials(IntegralPoint point){
+        calcValueAndAdd(point);
+    }
+
+    private void calcValueAndAdd(IntegralPoint point){
         List<Double> valuesList = new ArrayList<>();
         valuesList.add(firstFunction(point));
         valuesList.add(secondFunction(point));
         valuesList.add(thirdFunction(point));
         valuesList.add(fourthFunction(point));
         matrix.add(valuesList);
+    }
+
+    public void addPointAndCalculateDifferentials(IntegralPoint... points){
+        for (IntegralPoint point : points) {
+            calcValueAndAdd(point);
+        }
     }
 
     public void printMatrix(){
@@ -37,5 +47,9 @@ public abstract class Matrix {
 
     public List<Double> getMatrixForPoint(int index) {
         return matrix.get(index);
+    }
+
+    public int getSizeOfMatrix(){
+        return matrix.size();
     }
 }
