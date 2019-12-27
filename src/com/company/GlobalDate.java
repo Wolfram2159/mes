@@ -1,15 +1,15 @@
 package com.company;
 
 public class GlobalDate {
-    private float H;
-    private float W;
+    private double H;
+    private double W;
     private int nH;
     private int nW;
 
     private int nN;
     private int nE;
 
-    public GlobalDate(float h, float w, int nH, int nW) {
+    public GlobalDate(double h, double w, int nH, int nW) {
         this.H = h;
         this.W = w;
         this.nH = nH;
@@ -18,19 +18,19 @@ public class GlobalDate {
         nE = (nH - 1) * (nW - 1);
     }
 
-    public float getH() {
+    public double getH() {
         return H;
     }
 
-    public void setH(float h) {
+    public void setH(double h) {
         H = h;
     }
 
-    public float getW() {
+    public double getW() {
         return W;
     }
 
-    public void setW(float w) {
+    public void setW(double w) {
         W = w;
     }
 

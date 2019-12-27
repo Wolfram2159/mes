@@ -2,12 +2,12 @@ package com.company;
 
 public class Node {
     private int id;
-    private int x;
-    private int y;
+    private double x;
+    private double y;
     private float t;
     private boolean BC;
 
-    public Node(int id, int x, int y, float t, boolean BC) {
+    public Node(int id, double x, double y, float t, boolean BC) {
         this.id = id;
         this.x = x;
         this.y = y;
@@ -26,19 +26,19 @@ public class Node {
                 '}';
     }
 
-    public int getX() {
+    public double getX() {
         return x;
     }
 
-    public void setX(int x) {
+    public void setX(double x) {
         this.x = x;
     }
 
-    public int getY() {
+    public double getY() {
         return y;
     }
 
-    public void setY(int y) {
+    public void setY(double y) {
         this.y = y;
     }
 

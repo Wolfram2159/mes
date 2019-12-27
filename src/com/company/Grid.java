@@ -28,17 +28,17 @@ public class Grid {
 
     private void buildNodes() {
         int id = 0;
-        for (int i = 0; i < globalDate.getnW(); i++) {
-            for (int j = 0; j < globalDate.getnH(); j++) {
-                Node node = new Node(id, i, j, 0, checkB(i, j));
+        for (double i = 0; i < (double) globalDate.getnW() * globalDate.getW(); i += globalDate.getW()) {
+            for (double j = 0; j < (double) globalDate.getnH() * globalDate.getH(); j += globalDate.getH()) {
+                Node node = new Node(id, i, j, 0, checkBC(i, j));
                 nodeList[id] = node;
                 id++;
             }
         }
     }
 
-    private boolean checkB(int x, int y) {
-        return (x == 0 || x == (globalDate.getnW() - 1) || y == 0 || y == (globalDate.getnH() - 1));
+    private boolean checkBC(double x, double y) {
+        return (x == 0 || x == ((globalDate.getnW() - 1) * globalDate.getW()) || y == 0 || y == ((globalDate.getnH() - 1) * globalDate.getH()));
     }
 
     private void buildElements() {
@@ -96,13 +96,13 @@ public class Grid {
                 //[A] * {b} = {c} <=> {b} = [A]-1 * {c}
                 SimpleMatrix matrixA = calculateJacobianMatrixForElement(element, eDifferentialMatrix, nDifferentialMatrix);
                 element.setJacobians(integralPoint, matrixA);
-                matrixA.inverseMatrix();
+                SimpleMatrix inversedMatrixA = SimpleMatrix.inverseMatrix(matrixA);
                 for (int formFunction = 0; formFunction < FORM_FUNCTION_COUNT; formFunction++) {
                     SimpleMatrix matrixC = new SimpleMatrix(2, 1);
                     matrixC.addValueAt(0, 0, eDifferentialMatrix.get(formFunction));
                     matrixC.addValueAt(1, 0, nDifferentialMatrix.get(formFunction));
 
-                    SimpleMatrix matrixB = SimpleMatrix.multiplyMatrixes(matrixA, matrixC);
+                    SimpleMatrix matrixB = SimpleMatrix.multiplyMatrixes(inversedMatrixA, matrixC);
                     xDifferentialMatrix.addValueAt(integralPoint, formFunction, matrixB.getValueAt(0, 0));
                     yDifferentialMatrix.addValueAt(integralPoint, formFunction, matrixB.getValueAt(1, 0));
                 }
@@ -132,6 +132,7 @@ public class Grid {
                 hLocalMatrix.multiplyByScalar(K * detJ);
                 element.addSubMatrixToH(hLocalMatrix);
             }
+            System.out.println("Matrix H");
             element.getLocalMatrixH().printMatrix();
         }
     }
@@ -152,7 +153,7 @@ public class Grid {
                 Node secondNode = element.getNodes()[indexes[side][1]];
                 SimpleMatrix jacobians = element.getJacobians(side);
                 double detJ = jacobians.calculateDeterminate();
-                if (checkIfNodesFromBound(firstNode, secondNode)){
+                if (checkIfNodesFromBound(firstNode, secondNode)) {
                     Matrix boundaryCondForSide = functionsValuesForBoundaryConditions.get(side);
                     SimpleMatrix matrix = MatrixMapper.convertMatrix(boundaryCondForSide);
                     for (int integralPoint = 0; integralPoint < boundaryCondForSide.getSizeOfMatrix(); integralPoint++) {
@@ -167,8 +168,8 @@ public class Grid {
     }
 
 
-    private boolean checkIfNodesFromBound(Node first, Node second){
-        return  ((first.getX() == 0 && second.getX() == 0) ||
+    private boolean checkIfNodesFromBound(Node first, Node second) {
+        return ((first.getX() == 0 && second.getX() == 0) ||
                 (first.getY() == 0 && second.getY() == 0) ||
                 (first.getX() == globalDate.getnW() - 1 && second.getX() == globalDate.getnW() - 1) ||
                 (first.getY() == globalDate.getnH() - 1 && second.getY() == globalDate.getnH() - 1));
@@ -190,6 +191,7 @@ public class Grid {
                 subMatrixC.multiplyByScalar(c * ro * detJ);
                 element.addSubMatrixToC(subMatrixC);
             }
+            System.out.println("Matrix C");
             element.getLocalMatrixC().printMatrix();
         }
     }
@@ -205,6 +207,7 @@ public class Grid {
                 subVectorP.multiplyByScalar(alfa * detJ);
                 element.addSubVectorToP(subVectorP);
             }
+            System.out.println("Matrix P");
             element.getLocalVectorP().printMatrix();
         }
     }

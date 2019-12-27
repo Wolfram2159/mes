@@ -111,15 +111,16 @@ public class SimpleMatrix {
         return result;
     }
 
-    public void inverseMatrix() {
-        double det = matrix[0][0] * matrix[1][1] - matrix[1][0] * matrix[0][1];
+    public static SimpleMatrix inverseMatrix(SimpleMatrix matrixToInverse) {
+        double det = matrixToInverse.matrix[0][0] * matrixToInverse.matrix[1][1] - matrixToInverse.matrix[1][0] * matrixToInverse.matrix[0][1];
         det = 1 / det;
-        double a = matrix[0][0];
-        matrix[0][0] = matrix[1][1];
-        matrix[1][1] = a;
-        matrix[1][0] *= -1;
-        matrix[0][1] *= -1;
-        multiplyByScalar(det);
+        SimpleMatrix inversedMatrix = new SimpleMatrix(matrixToInverse.n, matrixToInverse.m);
+        inversedMatrix.matrix[0][0] = matrixToInverse.matrix[1][1];
+        inversedMatrix.matrix[1][1] = matrixToInverse.matrix[0][0];
+        inversedMatrix.matrix[1][0] *= -1;
+        inversedMatrix.matrix[0][1] *= -1;
+        inversedMatrix.multiplyByScalar(det);
+        return inversedMatrix;
     }
 
     public SimpleMatrix transponateMatrix() {

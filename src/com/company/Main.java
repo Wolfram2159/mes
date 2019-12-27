@@ -9,7 +9,7 @@ public class Main {
 
     public static void main(String[] args) {
         Universal universal = new Universal();
-        GlobalDate globalDate = new GlobalDate(1, 1, 2, 3);
+        GlobalDate globalDate = new GlobalDate(1f/4f, 1f/4f, 2, 3);
         Grid grid = new Grid(globalDate);
         grid.setUniversal(universal);
         try {
