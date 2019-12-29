@@ -92,8 +92,4 @@ public class Universal {
     public List<Matrix> getFunctionsValuesForBoundaryConditions() {
         return functionsValuesForBoundaryConditions;
     }
-
-    public Matrix getBCForOneSide(int i){
-        return functionsValuesForBoundaryConditions.get(i);
-    }
 }

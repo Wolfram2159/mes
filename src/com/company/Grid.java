@@ -13,6 +13,7 @@ public class Grid {
 
     private GlobalDate globalDate;
     private Universal universal;
+    private GlobalMatrix globalMatrix;
 
     public Grid(GlobalDate globalDate) {
         this.globalDate = globalDate;
@@ -66,24 +67,21 @@ public class Grid {
         return nodeList[id];
     }
 
-    public Element getElement(int x, int y) {
-        int id = (globalDate.getnH() - 1) * x + y;
-        return grid[id];
-    }
-
-    public Element getElementById(int id) {
-        return grid[id];
-    }
-
     private final static int FORM_FUNCTION_COUNT = 4;
     private final static int INTEGRAL_POINTS_COUNT = 4;
 
-    public void calculateMatrixesForAllElements(double K, double c, double ro, double alfa) throws Exception {
+    public void calculateMatrixesForAllElements(double K, double c, double ro, double alfa, double ambientTemperature) throws Exception {
         calculateDifferentials();
         calculateHMatrixes(K);
-        calculateBoundaryConditions(alfa);
+        calculateBoundaryConditionsAndPVectors(alfa, ambientTemperature);
         calculateCMatrixes(c, ro);
-        calculatePVectors(alfa);
+        agregateElements();
+    }
+
+    private void agregateElements() throws Exception {
+        for (Element element : grid) {
+            globalMatrix.agregateElement(element);
+        }
     }
 
     private void calculateDifferentials() throws Exception {
@@ -132,12 +130,10 @@ public class Grid {
                 hLocalMatrix.multiplyByScalar(K * detJ);
                 element.addSubMatrixToH(hLocalMatrix);
             }
-            System.out.println("Matrix H");
-            element.getLocalMatrixH().printMatrix();
         }
     }
 
-    private void calculateBoundaryConditions(double alfa) throws Exception {
+    private void calculateBoundaryConditionsAndPVectors(double alfa, double ambientTemperature) throws Exception {
         final int[][] indexes = {
                 {0, 1},
                 {1, 2},
@@ -152,15 +148,20 @@ public class Grid {
                 Node firstNode = element.getNodes()[indexes[side][0]];
                 Node secondNode = element.getNodes()[indexes[side][1]];
                 SimpleMatrix jacobians = element.getJacobians(side);
-                double detJ = jacobians.calculateDeterminate();
+                double detJ = jacobians.getValueAt(0, 0);
                 if (checkIfNodesFromBound(firstNode, secondNode)) {
                     Matrix boundaryCondForSide = functionsValuesForBoundaryConditions.get(side);
                     SimpleMatrix matrix = MatrixMapper.convertMatrix(boundaryCondForSide);
                     for (int integralPoint = 0; integralPoint < boundaryCondForSide.getSizeOfMatrix(); integralPoint++) {
                         SimpleMatrix rowForIntegralPoint = matrix.getRowAsMatrix(integralPoint);
+                        //BoundaryConditions
                         SimpleMatrix subMatrixForBoundaryCond = multiplyRowByColumn(rowForIntegralPoint);
                         subMatrixForBoundaryCond.multiplyByScalar(alfa * detJ);
                         element.addSubMatrixToH(subMatrixForBoundaryCond);
+                        //P Vector
+                        SimpleMatrix subMatrixForPVector = rowForIntegralPoint.transponateMatrix();
+                        subMatrixForPVector.multiplyByScalar(detJ * alfa * ambientTemperature);
+                        element.addSubVectorToP(subMatrixForPVector);
                     }
                 }
             }
@@ -171,8 +172,8 @@ public class Grid {
     private boolean checkIfNodesFromBound(Node first, Node second) {
         return ((first.getX() == 0 && second.getX() == 0) ||
                 (first.getY() == 0 && second.getY() == 0) ||
-                (first.getX() == globalDate.getnW() - 1 && second.getX() == globalDate.getnW() - 1) ||
-                (first.getY() == globalDate.getnH() - 1 && second.getY() == globalDate.getnH() - 1));
+                (first.getX() == (globalDate.getnW() - 1) * globalDate.getW() && second.getX() == (globalDate.getnW() - 1) * globalDate.getW()) ||
+                (first.getY() == (globalDate.getnH() - 1) * globalDate.getH() && second.getY() == (globalDate.getnH() - 1) * globalDate.getH()));
     }
 
     private SimpleMatrix multiplyRowByColumn(SimpleMatrix rowForIntegralPoint) throws Exception {
@@ -191,12 +192,10 @@ public class Grid {
                 subMatrixC.multiplyByScalar(c * ro * detJ);
                 element.addSubMatrixToC(subMatrixC);
             }
-            System.out.println("Matrix C");
-            element.getLocalMatrixC().printMatrix();
         }
     }
 
-    private void calculatePVectors(double alfa) {
+    private void calculatePVectors(double alfa, double ambientTemperature) {
         for (Element element : grid) {
             SimpleMatrix formFunctionValues = element.getFormFunctionValues();
             for (int integralPoint = 0; integralPoint < INTEGRAL_POINTS_COUNT; integralPoint++) {
@@ -204,11 +203,9 @@ public class Grid {
                 double detJ = jacobian.calculateDeterminate();
                 SimpleMatrix formFunctionsRow = formFunctionValues.getRowAsMatrix(integralPoint);
                 SimpleMatrix subVectorP = formFunctionsRow.transponateMatrix();
-                subVectorP.multiplyByScalar(alfa * detJ);
+                subVectorP.multiplyByScalar(alfa * detJ * ambientTemperature);
                 element.addSubVectorToP(subVectorP);
             }
-            System.out.println("Matrix P");
-            element.getLocalVectorP().printMatrix();
         }
     }
 
@@ -233,5 +230,9 @@ public class Grid {
 
     public void setUniversal(Universal universal) {
         this.universal = universal;
+    }
+
+    public void setGlobalMatrix(GlobalMatrix globalMatrix) {
+        this.globalMatrix = globalMatrix;
     }
 }
