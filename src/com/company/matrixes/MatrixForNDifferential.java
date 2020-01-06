@@ -1,6 +1,6 @@
 package com.company.matrixes;
 
-public class MatrixForNDifferential extends Matrix {
+public class MatrixForNDifferential extends UniversalMatrix {
 
     public MatrixForNDifferential() {
         super();

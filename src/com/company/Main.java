@@ -1,6 +1,6 @@
 package com.company;
 
-import com.company.matrixes.SimpleMatrix;
+import com.company.matrixes.Matrix;
 
 public class Main {
     //
@@ -21,18 +21,16 @@ public class Main {
     private final static float elementW = gridW * (1f / (nW - 1));
 
     public static void main(String[] args) {
-        Universal universal = new Universal();
         GlobalDate globalDate = new GlobalDate(elementH, elementW, nH, nW);
         GlobalMatrix globalMatrix = new GlobalMatrix(globalDate.getnN());
         Grid grid = new Grid(globalDate);
-        grid.setUniversal(universal);
         grid.setGlobalMatrix(globalMatrix);
         try {
             grid.calculateMatrixesForAllElements(conductivity, specificHeat, density, alfa, ambientTemp);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        SimpleMatrix initialTempMatrix = new SimpleMatrix(globalDate.getnN(), 1);
+        Matrix initialTempMatrix = new Matrix(globalDate.getnN(), 1);
         initialTempMatrix.addValuesToAllCells(initialTemp);
         try {
             ProblemCalculator problemCalculator = new ProblemCalculator(globalMatrix, stepTime, simulationTime, initialTempMatrix);

@@ -1,18 +1,18 @@
 package com.company;
 
-import com.company.matrixes.SimpleMatrix;
+import com.company.matrixes.Matrix;
 
 public class ProblemCalculator {
-    private SimpleMatrix newHInversion;
-    private SimpleMatrix newP;
+    private Matrix newHInversion;
+    private Matrix newP;
     private double stepTime;
     private double simulationTime;
-    private SimpleMatrix initialTemp;
-    private SimpleMatrix searchingTemp;
-    private SimpleMatrix cDivideByDTau;
+    private Matrix initialTemp;
+    private Matrix searchingTemp;
+    private Matrix cDivideByDTau;
     private GlobalMatrix globalMatrix;
 
-    public ProblemCalculator(GlobalMatrix globalMatrix, double stepTime, double simulationTime, SimpleMatrix initialTemp) throws Exception {
+    public ProblemCalculator(GlobalMatrix globalMatrix, double stepTime, double simulationTime, Matrix initialTemp) throws Exception {
         this.stepTime = stepTime;
         this.simulationTime = simulationTime;
         this.initialTemp = initialTemp;
@@ -21,7 +21,7 @@ public class ProblemCalculator {
     }
 
     private void calculateConstantValues() throws Exception {
-        SimpleMatrix cDivideByTau = globalMatrix.getcGlobal();
+        Matrix cDivideByTau = globalMatrix.getcGlobal();
         cDivideByTau.divideByScalar(stepTime);
         this.cDivideByDTau = cDivideByTau;
         this.newHInversion = globalMatrix.gethGlobal();
@@ -31,22 +31,21 @@ public class ProblemCalculator {
         calculateNewP(initialTemp);
     }
 
-    private void calculateNewP(SimpleMatrix temperature) throws Exception {
-        SimpleMatrix subNewP = SimpleMatrix.multiplyMatrixes(cDivideByDTau, temperature);
-        subNewP.addMatrixAtIndex(0, 0, globalMatrix.getpGlobal());
-        this.newP = subNewP;
-        //this.newP.printMatrix();
-    }
-
     public void solveProblem() throws Exception {
         for (int i = (int) stepTime; i <= simulationTime; i += stepTime) {
-            searchingTemp = SimpleMatrix.multiplyMatrixes(this.newHInversion, this.newP);
+            searchingTemp = Matrix.multiplyMatrixes(this.newHInversion, this.newP);
             searchMinAndMax(searchingTemp);
             calculateNewP(searchingTemp);
         }
     }
 
-    private void searchMinAndMax(SimpleMatrix searchingTemp) {
+    private void calculateNewP(Matrix temperature) throws Exception {
+        Matrix subNewP = Matrix.multiplyMatrixes(cDivideByDTau, temperature);
+        subNewP.addMatrixAtIndex(0, 0, globalMatrix.getpGlobal());
+        this.newP = subNewP;
+    }
+
+    private void searchMinAndMax(Matrix searchingTemp) {
         double[][] temp = searchingTemp.getMatrix();
         double min = temp[0][0];
         double max = 0;

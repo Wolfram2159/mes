@@ -3,9 +3,9 @@ package com.company.matrixes;
 import java.util.List;
 
 public class MatrixMapper {
-    public static SimpleMatrix convertMatrix(Matrix sourceMatrix) {
+    public static Matrix convertMatrix(UniversalMatrix sourceMatrix) {
         int size = sourceMatrix.getSizeOfMatrix();
-        SimpleMatrix result = new SimpleMatrix(size, 4);
+        Matrix result = new Matrix(size, 4);
         for (int integralPoint = 0; integralPoint < size; integralPoint++) {
             List<Double> valuesForPoint = sourceMatrix.getMatrixForPoint(integralPoint);
             result.addValueAt(integralPoint, 0, valuesForPoint.get(0));

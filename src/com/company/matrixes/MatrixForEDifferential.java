@@ -1,7 +1,7 @@
 package com.company.matrixes;
 
 
-public class MatrixForEDifferential extends Matrix {
+public class MatrixForEDifferential extends UniversalMatrix {
 
     public MatrixForEDifferential() {
         super();

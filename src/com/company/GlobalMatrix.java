@@ -1,60 +1,60 @@
 package com.company;
 
-import com.company.matrixes.SimpleMatrix;
+import com.company.matrixes.Matrix;
 
 public class GlobalMatrix {
-    private SimpleMatrix hGlobal;
-    private SimpleMatrix cGlobal;
-    private SimpleMatrix pGlobal;
+    private Matrix hGlobal;
+    private Matrix cGlobal;
+    private Matrix pGlobal;
 
     public GlobalMatrix(int nodesNumber) {
-        hGlobal = new SimpleMatrix(nodesNumber, nodesNumber);
-        cGlobal = new SimpleMatrix(nodesNumber, nodesNumber);
-        pGlobal = new SimpleMatrix(nodesNumber, 1);
+        hGlobal = new Matrix(nodesNumber, nodesNumber);
+        cGlobal = new Matrix(nodesNumber, nodesNumber);
+        pGlobal = new Matrix(nodesNumber, 1);
     }
 
     public void agregateElement(Element element) throws Exception {
         Node[] nodes = element.getNodes();
-        SimpleMatrix localMatrixH = element.getLocalMatrixH();
-        SimpleMatrix localMatrixC = element.getLocalMatrixC();
-        SimpleMatrix localVectorP = element.getLocalVectorP();
+        Matrix localMatrixH = element.getLocalMatrixH();
+        Matrix localMatrixC = element.getLocalMatrixC();
+        Matrix localVectorP = element.getLocalVectorP();
         for (int y = 0; y < 4; y++) {
             for (int x = 0; x < 4; x++) {
                 int i = nodes[y].getId();
                 int j = nodes[x].getId();
-                SimpleMatrix hCell = localMatrixH.getCellAsMatrix(y, x);
+                Matrix hCell = localMatrixH.getCellAsMatrix(y, x);
                 addToH(i, j, hCell);
-                SimpleMatrix cCell = localMatrixC.getCellAsMatrix(y, x);
+                Matrix cCell = localMatrixC.getCellAsMatrix(y, x);
                 addToC(i, j, cCell);
             }
             int i = nodes[y].getId();
             int j = 0;
-            SimpleMatrix pCell = localVectorP.getCellAsMatrix(y, 0);
+            Matrix pCell = localVectorP.getCellAsMatrix(y, 0);
             addToP(i, j, pCell);
         }
     }
 
-    public void addToH(int i, int j, SimpleMatrix cell) throws Exception {
+    private void addToH(int i, int j, Matrix cell) throws Exception {
         hGlobal.addMatrixAtIndex(i, j, cell);
     }
 
-    public void addToC(int i, int j, SimpleMatrix cell) throws Exception {
+    private void addToC(int i, int j, Matrix cell) throws Exception {
         cGlobal.addMatrixAtIndex(i, j, cell);
     }
 
-    public void addToP(int i, int j, SimpleMatrix cell) throws Exception {
+    private void addToP(int i, int j, Matrix cell) throws Exception {
         pGlobal.addMatrixAtIndex(i, j, cell);
     }
 
-    public SimpleMatrix gethGlobal() {
+    public Matrix gethGlobal() {
         return hGlobal;
     }
 
-    public SimpleMatrix getcGlobal() {
+    public Matrix getcGlobal() {
         return cGlobal;
     }
 
-    public SimpleMatrix getpGlobal() {
+    public Matrix getpGlobal() {
         return pGlobal;
     }
 }

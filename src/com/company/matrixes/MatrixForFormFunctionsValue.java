@@ -1,6 +1,6 @@
 package com.company.matrixes;
 
-public class MatrixForFormFunctionsValue extends Matrix {
+public class MatrixForFormFunctionsValue extends UniversalMatrix {
     public MatrixForFormFunctionsValue() {
         super();
     }

@@ -1,6 +1,6 @@
 package com.company;
 
-import com.company.matrixes.SimpleMatrix;
+import com.company.matrixes.Matrix;
 
 import java.util.Arrays;
 
@@ -9,23 +9,23 @@ public class Element {
     private int id;
 
     private Node[] nodes;
-    private SimpleMatrix dNdyDiff = new SimpleMatrix(4, 4);
-    private SimpleMatrix dNdxDiff = new SimpleMatrix(4, 4);
-    private SimpleMatrix formFunctionValues = new SimpleMatrix(4, 4);
-    private SimpleMatrix[] jacobians = new SimpleMatrix[4];
-    private SimpleMatrix localMatrixH;
-    private SimpleMatrix localMatrixC;
-    private SimpleMatrix localVectorP;
+    private Matrix dNdyDiff = new Matrix(4, 4);
+    private Matrix dNdxDiff = new Matrix(4, 4);
+    private Matrix formFunctionValues = new Matrix(4, 4);
+    private Matrix[] jacobians = new Matrix[4];
+    private Matrix localMatrixH;
+    private Matrix localMatrixC;
+    private Matrix localVectorP;
 
     public Element(int id, Node[] nodes) {
         this.id = id;
         this.nodes = nodes;
-        this.localMatrixH = new SimpleMatrix(4, 4);
-        this.localMatrixC = new SimpleMatrix(4, 4);
-        this.localVectorP = new SimpleMatrix(4, 1);
+        this.localMatrixH = new Matrix(4, 4);
+        this.localMatrixC = new Matrix(4, 4);
+        this.localVectorP = new Matrix(4, 1);
     }
 
-    public void addSubMatrixToH(SimpleMatrix localSubMatrix) {
+    public void addSubMatrixToH(Matrix localSubMatrix) {
         try {
             localMatrixH.addMatrixAtIndex(0, 0, localSubMatrix);
         } catch (Exception e) {
@@ -33,7 +33,7 @@ public class Element {
         }
     }
 
-    public void addSubMatrixToC(SimpleMatrix localSubMatrix){
+    public void addSubMatrixToC(Matrix localSubMatrix){
         try {
             localMatrixC.addMatrixAtIndex(0, 0, localSubMatrix);
         } catch (Exception e) {
@@ -41,7 +41,7 @@ public class Element {
         }
     }
 
-    public void addSubVectorToP(SimpleMatrix localSubMatrix){
+    public void addSubVectorToP(Matrix localSubMatrix){
         try {
             localVectorP.addMatrixAtIndex(0, 0, localSubMatrix);
         } catch (Exception e) {
@@ -49,47 +49,47 @@ public class Element {
         }
     }
 
-    public SimpleMatrix getLocalMatrixH() {
+    public Matrix getLocalMatrixH() {
         return localMatrixH;
     }
 
-    public SimpleMatrix getLocalMatrixC() {
+    public Matrix getLocalMatrixC() {
         return localMatrixC;
     }
 
-    public SimpleMatrix getLocalVectorP() {
+    public Matrix getLocalVectorP() {
         return localVectorP;
     }
 
-    public SimpleMatrix getFormFunctionValues() {
+    public Matrix getFormFunctionValues() {
         return formFunctionValues;
     }
 
-    public void setFormFunctionValues(SimpleMatrix formFunctionValues) {
+    public void setFormFunctionValues(Matrix formFunctionValues) {
         this.formFunctionValues = formFunctionValues;
     }
 
-    public void setdNdyDiff(SimpleMatrix dNdyDiff) {
+    public void setdNdyDiff(Matrix dNdyDiff) {
         this.dNdyDiff = dNdyDiff;
     }
 
-    public void setdNdxDiff(SimpleMatrix dNdxDiff) {
+    public void setdNdxDiff(Matrix dNdxDiff) {
         this.dNdxDiff = dNdxDiff;
     }
 
-    public SimpleMatrix getdNdyDiff() {
+    public Matrix getdNdyDiff() {
         return dNdyDiff;
     }
 
-    public SimpleMatrix getdNdxDiff() {
+    public Matrix getdNdxDiff() {
         return dNdxDiff;
     }
 
-    public SimpleMatrix getJacobians(int index) {
+    public Matrix getJacobians(int index) {
         return jacobians[index];
     }
 
-    public void setJacobians(int index, SimpleMatrix jacobian) {
+    public void setJacobians(int index, Matrix jacobian) {
         jacobians[index] = jacobian;
     }
 
