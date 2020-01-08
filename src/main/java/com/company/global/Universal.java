@@ -1,4 +1,4 @@
-package com.company;
+package com.company.global;
 
 import com.company.matrixes.UniversalMatrix;
 import com.company.matrixes.MatrixForEDifferential;

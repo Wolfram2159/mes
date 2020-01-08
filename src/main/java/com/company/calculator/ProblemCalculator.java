@@ -1,5 +1,6 @@
-package com.company;
+package com.company.calculator;
 
+import com.company.global.GlobalMatrix;
 import com.company.matrixes.Matrix;
 
 public class ProblemCalculator {

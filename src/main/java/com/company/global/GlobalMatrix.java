@@ -1,5 +1,7 @@
-package com.company;
+package com.company.global;
 
+import com.company.grid.Element;
+import com.company.grid.Node;
 import com.company.matrixes.Matrix;
 
 public class GlobalMatrix {

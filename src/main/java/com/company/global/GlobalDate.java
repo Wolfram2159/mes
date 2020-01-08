@@ -1,4 +1,4 @@
-package com.company;
+package com.company.global;
 
 public class GlobalDate {
     private double H;
@@ -10,8 +10,8 @@ public class GlobalDate {
     private int nE;
 
     public GlobalDate(double h, double w, int nH, int nW) {
-        this.H = h;
-        this.W = w;
+        this.H = h * (1f / (nH - 1));
+        this.W = w * (1f / (nW - 1));
         this.nH = nH;
         this.nW = nW;
         nN = nH * nW;

@@ -1,4 +1,4 @@
-package com.company;
+package com.company.grid;
 
 public class Node {
     private int id;

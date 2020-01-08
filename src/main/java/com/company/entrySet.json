@@ -1,0 +1,14 @@
+{
+    "conductivity":"25",
+    "specificHeat":"700",
+    "density":"7800",
+    "alfa":"300",
+    "ambientTemperature":"1200",
+    "initialTemperature":"100",
+    "nH":"4",
+    "nW":"4",
+    "gridH":"0.1",
+    "gridW":"0.1",
+    "stepTime":"50",
+    "simulationTime":"500"
+}

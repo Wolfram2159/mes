@@ -1,5 +1,8 @@
-package com.company;
+package com.company.grid;
 
+import com.company.global.Universal;
+import com.company.global.GlobalDate;
+import com.company.global.GlobalMatrix;
 import com.company.matrixes.UniversalMatrix;
 import com.company.matrixes.MatrixMapper;
 import com.company.matrixes.Matrix;
@@ -13,7 +16,7 @@ public class Grid {
 
     private GlobalDate globalDate;
     private Universal universal;
-    private com.company.GlobalMatrix globalMatrix;
+    private GlobalMatrix globalMatrix;
 
     public Grid(GlobalDate globalDate) {
         this.globalDate = globalDate;
@@ -87,15 +90,16 @@ public class Grid {
 
     private void calculateDifferentials() throws Exception {
         for (Element element : grid) {
+            calculateJacobians1D(element);
             Matrix xDifferentialMatrix = new Matrix(4, 4);
             Matrix yDifferentialMatrix = new Matrix(4, 4);
             for (int integralPoint = 0; integralPoint < INTEGRAL_POINTS_COUNT; integralPoint++) {
                 List<Double> eDifferentialMatrix = universal.geteDifferentials().getMatrixForPoint(integralPoint);
                 List<Double> nDifferentialMatrix = universal.getnDifferentials().getMatrixForPoint(integralPoint);
                 //[A] * {b} = {c} <=> {b} = [A]-1 * {c}
-                Matrix matrixA = calculateJacobianMatrixForElement(element, eDifferentialMatrix, nDifferentialMatrix);
-                element.setJacobians(integralPoint, matrixA);
-                Matrix inversedMatrixA = Matrix.inverseMatrix(matrixA);
+                Matrix jacobian = calculateJacobian2D(element, eDifferentialMatrix, nDifferentialMatrix);
+                element.setJacobian2D(integralPoint, jacobian);
+                Matrix inversedMatrixA = Matrix.inverseMatrix(jacobian);
                 for (int formFunction = 0; formFunction < FORM_FUNCTION_COUNT; formFunction++) {
                     Matrix matrixC = new Matrix(2, 1);
                     matrixC.addValueAt(0, 0, eDifferentialMatrix.get(formFunction));
@@ -118,7 +122,7 @@ public class Grid {
             Matrix xDifferential = element.getdNdxDiff();
             Matrix yDifferential = element.getdNdyDiff();
             for (int integralPoint = 0; integralPoint < INTEGRAL_POINTS_COUNT; integralPoint++) {
-                Matrix jacobian = element.getJacobians(integralPoint);
+                Matrix jacobian = element.getJacobian2D(integralPoint);
                 double detJ = jacobian.calculateDeterminate();
                 //DN/DX
                 Matrix xRowDiff = xDifferential.getRowAsMatrix(integralPoint);
@@ -148,8 +152,7 @@ public class Grid {
             for (int side = 0; side < 4; side++) {
                 Node firstNode = element.getNodes()[indexes[side][0]];
                 Node secondNode = element.getNodes()[indexes[side][1]];
-                Matrix jacobians = element.getJacobians(side);
-                double detJ = jacobians.getValueAt(0, 0);
+                double detJ = element.getJacobian1D(side);
                 if (checkIfNodesFromBound(firstNode, secondNode)) {
                     UniversalMatrix boundaryCondForSide = functionsValuesForBoundaryConditions.get(side);
                     Matrix matrix = MatrixMapper.convertMatrix(boundaryCondForSide);
@@ -186,7 +189,7 @@ public class Grid {
         for (Element element : grid) {
             Matrix formFunctionValues = element.getFormFunctionValues();
             for (int integralPoint = 0; integralPoint < INTEGRAL_POINTS_COUNT; integralPoint++) {
-                Matrix jacobian = element.getJacobians(integralPoint);
+                Matrix jacobian = element.getJacobian2D(integralPoint);
                 double detJ = jacobian.calculateDeterminate();
                 Matrix formFunctionsRow = formFunctionValues.getRowAsMatrix(integralPoint);
                 Matrix subMatrixC = multiplyRowByColumn(formFunctionsRow);
@@ -196,7 +199,7 @@ public class Grid {
         }
     }
 
-    private Matrix calculateJacobianMatrixForElement(Element element, List<Double> EDiff, List<Double> NDiff) {
+    private Matrix calculateJacobian2D(Element element, List<Double> EDiff, List<Double> NDiff) {
         Matrix jacobian = new Matrix(2, 2);
         double dxdE = 0;
         double dydE = 0;
@@ -215,11 +218,30 @@ public class Grid {
         return jacobian;
     }
 
+    private void calculateJacobians1D(Element element) {
+        final int[][] indexes = {
+                {0, 1},
+                {1, 2},
+                {2, 3},
+                {3, 0}
+        };
+
+        for (int[] index : indexes) {
+            int jacobianIndex = index[0];
+            Node firstNode = element.getNodes()[index[0]];
+            Node secondNode = element.getNodes()[index[1]];
+            double deltaX = Math.pow((secondNode.getX() - firstNode.getX()), 2);
+            double deltaY = Math.pow((secondNode.getY() - firstNode.getY()), 2);
+            double deltaLength = Math.sqrt(deltaX + deltaY) / 2;
+            element.setJacobian1D(jacobianIndex, deltaLength);
+        }
+    }
+
     public void setUniversal(Universal universal) {
         this.universal = universal;
     }
 
-    public void setGlobalMatrix(com.company.GlobalMatrix globalMatrix) {
+    public void setGlobalMatrix(GlobalMatrix globalMatrix) {
         this.globalMatrix = globalMatrix;
     }
 }

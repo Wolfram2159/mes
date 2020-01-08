@@ -1,4 +1,4 @@
-package com.company;
+package com.company.grid;
 
 import com.company.matrixes.Matrix;
 
@@ -12,7 +12,8 @@ public class Element {
     private Matrix dNdyDiff = new Matrix(4, 4);
     private Matrix dNdxDiff = new Matrix(4, 4);
     private Matrix formFunctionValues = new Matrix(4, 4);
-    private Matrix[] jacobians = new Matrix[4];
+    private Matrix[] jacobians2D = new Matrix[4];
+    private double[] jacobians1D = new double[4];
     private Matrix localMatrixH;
     private Matrix localMatrixC;
     private Matrix localVectorP;
@@ -85,12 +86,20 @@ public class Element {
         return dNdxDiff;
     }
 
-    public Matrix getJacobians(int index) {
-        return jacobians[index];
+    public Matrix getJacobian2D(int index) {
+        return jacobians2D[index];
     }
 
-    public void setJacobians(int index, Matrix jacobian) {
-        jacobians[index] = jacobian;
+    public void setJacobian2D(int index, Matrix jacobian) {
+        jacobians2D[index] = jacobian;
+    }
+
+    public double getJacobian1D(int index) {
+        return jacobians1D[index];
+    }
+
+    public void setJacobian1D(int index, double jacobian1D) {
+        this.jacobians1D[index] = jacobian1D;
     }
 
     public int getId() {
